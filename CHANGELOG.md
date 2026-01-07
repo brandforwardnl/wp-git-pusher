@@ -1,0 +1,36 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [1.0.0] - 2026-01-06
+
+### Added
+- Initial release of GitHub Push WordPress plugin
+- Admin interface with Repositories, Settings, and Logs pages
+- GitHub API integration for fetching repositories
+- Plugin and theme installation from GitHub repositories
+- Automatic update checking via WP-Cron
+- Webhook support for instant updates
+- Version selection and rollback functionality
+- View changes modal with release notes/commit messages
+- Support for both classic and fine-grained GitHub tokens
+- Public and private repository support
+- Backup and restore functionality
+- Version display (installed and latest versions)
+- Always-visible action buttons in repositories table
+- Plugin/theme type selection (plugin or theme)
+- Comprehensive logging system
+- Help tabs with FAQ section
+
+### Security
+- Nonce verification for all form submissions
+- Capability checks for admin actions
+- Input sanitization and output escaping
+- Secure token storage
+- HMAC signature validation for webhooks
+

@@ -1,0 +1,23 @@
+# WordPress
+.DS_Store
+*.log
+*.tmp
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build
+*.zip
+
+# Backup files
+*.bak
+*.backup
+
