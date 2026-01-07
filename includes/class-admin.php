@@ -389,6 +389,8 @@ class Admin {
         $plugin_slug = sanitize_text_field($_POST['plugin_slug'] ?? '');
         $install_path = sanitize_text_field($_POST['install_path'] ?? '');
         $use_releases = isset($_POST['use_releases']) && $_POST['use_releases'] === '1';
+        $item_type = isset($_POST['item_type']) && in_array($_POST['item_type'], array('plugin', 'theme')) ? $_POST['item_type'] : 'plugin';
+        $auto_update = isset($_POST['auto_update']) && $_POST['auto_update'] === '1';
         
         $update_data = array();
         
@@ -405,6 +407,7 @@ class Admin {
         }
         
         $update_data['use_releases'] = $use_releases;
+        $update_data['item_type'] = $item_type;
         $update_data['auto_update'] = $auto_update;
         
         $result = $this->repository_manager->update($repo_id, $update_data);
