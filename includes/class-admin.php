@@ -270,6 +270,7 @@ class Admin {
         $install_path = sanitize_text_field($_POST['install_path'] ?? '');
         $use_releases = isset($_POST['use_releases']) && $_POST['use_releases'] === '1';
         $item_type = isset($_POST['item_type']) && in_array($_POST['item_type'], array('plugin', 'theme')) ? $_POST['item_type'] : 'plugin';
+        $auto_update = isset($_POST['auto_update']) && $_POST['auto_update'] === '1';
             
             $this->logger->log('info', 'Adding repository', array(
                 'repo_owner' => $repo_owner,
@@ -327,6 +328,7 @@ class Admin {
                 'install_path' => $install_path,
                 'use_releases' => $use_releases,
                 'item_type' => $item_type,
+                'auto_update' => $auto_update,
             ));
             
             if (is_wp_error($result)) {
@@ -403,6 +405,7 @@ class Admin {
         }
         
         $update_data['use_releases'] = $use_releases;
+        $update_data['auto_update'] = $auto_update;
         
         $result = $this->repository_manager->update($repo_id, $update_data);
         
@@ -593,6 +596,24 @@ class Admin {
                             <input type="radio" name="use_releases" value="1" <?php checked($repo->use_releases ?? false); ?>>
                             <?php esc_html_e('Tag-based releases', GITHUB_PUSH_TEXT_DOMAIN); ?>
                         </label>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row">
+                        <label for="auto_update"><?php esc_html_e('Auto-Update via Webhook', GITHUB_PUSH_TEXT_DOMAIN); ?></label>
+                    </th>
+                    <td>
+                        <label>
+                            <input type="checkbox" id="auto_update" name="auto_update" value="1" <?php checked($repo->auto_update ?? false); ?>>
+                            <?php esc_html_e('Automatically update when webhook is triggered', GITHUB_PUSH_TEXT_DOMAIN); ?>
+                        </label>
+                        <p class="description">
+                            <?php esc_html_e('If enabled, the plugin/theme will automatically update when GitHub sends a webhook event (push or release).', GITHUB_PUSH_TEXT_DOMAIN); ?>
+                            <br>
+                            <strong><?php esc_html_e('Note:', GITHUB_PUSH_TEXT_DOMAIN); ?></strong>
+                            <?php esc_html_e('In GitHub webhook settings, set Content type to "application/json".', GITHUB_PUSH_TEXT_DOMAIN); ?>
+                        </p>
                     </td>
                 </tr>
             </table>
@@ -805,6 +826,14 @@ class Admin {
                                 <br>
                                 <strong><?php esc_html_e('Webhook URL:', GITHUB_PUSH_TEXT_DOMAIN); ?></strong>
                                 <code><?php echo esc_html($webhook_url); ?></code>
+                                <br><br>
+                                <strong><?php esc_html_e('GitHub Webhook Configuration:', GITHUB_PUSH_TEXT_DOMAIN); ?></strong>
+                                <br>
+                                <?php esc_html_e('• Content type:', GITHUB_PUSH_TEXT_DOMAIN); ?> <strong><?php esc_html_e('application/json', GITHUB_PUSH_TEXT_DOMAIN); ?></strong>
+                                <br>
+                                <?php esc_html_e('• Events: Select "Just the push event" for branch-based updates, or "Let me select individual events" and choose "Releases" for release-based updates.', GITHUB_PUSH_TEXT_DOMAIN); ?>
+                                <br>
+                                <?php esc_html_e('• Secret: Use the secret configured above (or generate a random one).', GITHUB_PUSH_TEXT_DOMAIN); ?>
                             </p>
                         </td>
                     </tr>

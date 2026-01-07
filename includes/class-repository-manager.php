@@ -61,6 +61,7 @@ class Repository_Manager {
             install_path varchar(500) NOT NULL,
             use_releases tinyint(1) NOT NULL DEFAULT 0,
             item_type varchar(20) NOT NULL DEFAULT 'plugin',
+            auto_update tinyint(1) NOT NULL DEFAULT 0,
             last_commit_hash varchar(40) DEFAULT NULL,
             last_checked datetime DEFAULT NULL,
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
@@ -122,6 +123,7 @@ class Repository_Manager {
         $install_path = sanitize_text_field($data['install_path']);
         $use_releases = isset($data['use_releases']) && $data['use_releases'] ? 1 : 0;
         $item_type = isset($data['item_type']) && in_array($data['item_type'], array('plugin', 'theme')) ? $data['item_type'] : 'plugin';
+        $auto_update = isset($data['auto_update']) && $data['auto_update'] ? 1 : 0;
         
         // Validate repository name format.
         if (!preg_match('/^[a-zA-Z0-9_.-]+$/', $repo_owner) || !preg_match('/^[a-zA-Z0-9_.-]+$/', $repo_name)) {
@@ -144,8 +146,9 @@ class Repository_Manager {
                 'install_path' => $install_path,
                 'use_releases' => $use_releases,
                 'item_type' => $item_type,
+                'auto_update' => $auto_update,
             ),
-            array('%s', '%s', '%s', '%s', '%s', '%d', '%s')
+            array('%s', '%s', '%s', '%s', '%s', '%d', '%s', '%d')
         );
         
         if ($result === false) {
@@ -214,6 +217,11 @@ class Repository_Manager {
         if (isset($data['item_type']) && in_array($data['item_type'], array('plugin', 'theme'))) {
             $update_data['item_type'] = $data['item_type'];
             $format[] = '%s';
+        }
+        
+        if (isset($data['auto_update'])) {
+            $update_data['auto_update'] = $data['auto_update'] ? 1 : 0;
+            $format[] = '%d';
         }
         
         if (isset($data['last_commit_hash'])) {
@@ -324,6 +332,11 @@ class Repository_Manager {
         $repo->use_releases = (bool) $repo->use_releases;
         if (!isset($repo->item_type)) {
             $repo->item_type = 'plugin';
+        }
+        if (!isset($repo->auto_update)) {
+            $repo->auto_update = false;
+        } else {
+            $repo->auto_update = (bool) $repo->auto_update;
         }
         return $repo;
     }
