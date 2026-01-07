@@ -77,6 +77,26 @@ class Repository_Manager {
     }
     
     /**
+     * Migrate table to add new columns if they don't exist.
+     */
+    public static function migrate_table() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'github_push_repositories';
+        
+        // Check if auto_update column exists.
+        $column_exists = $wpdb->get_results($wpdb->prepare(
+            "SHOW COLUMNS FROM {$table_name} LIKE %s",
+            'auto_update'
+        ));
+        
+        if (empty($column_exists)) {
+            // Add auto_update column.
+            $wpdb->query("ALTER TABLE {$table_name} ADD COLUMN auto_update tinyint(1) NOT NULL DEFAULT 0 AFTER item_type");
+        }
+    }
+    
+    /**
      * Get repository by ID.
      *
      * @param int $id Repository ID.
@@ -88,9 +108,22 @@ class Repository_Manager {
         $repo = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$this->table_name} WHERE id = %d",
             $id
+        ), ARRAY_A);
+        
+        if (!$repo) {
+            return null;
+        }
+        
+        // Convert to object for consistency.
+        $repo_obj = (object) $repo;
+        
+        $this->logger->log('info', 'Retrieved repository from database', array(
+            'id' => $id,
+            'auto_update_raw' => isset($repo['auto_update']) ? $repo['auto_update'] : 'not_set',
+            'auto_update_type' => isset($repo['auto_update']) ? gettype($repo['auto_update']) : 'not_set',
         ));
         
-        return $repo ? $this->normalize_repo($repo) : null;
+        return $this->normalize_repo($repo_obj);
     }
     
     /**
@@ -219,9 +252,15 @@ class Repository_Manager {
             $format[] = '%s';
         }
         
-        if (isset($data['auto_update'])) {
+        // Always update auto_update if it's in the data array (even if false).
+        if (array_key_exists('auto_update', $data)) {
             $update_data['auto_update'] = $data['auto_update'] ? 1 : 0;
             $format[] = '%d';
+            $this->logger->log('info', 'Updating auto_update', array(
+                'id' => $id,
+                'auto_update_value' => $data['auto_update'],
+                'auto_update_saved' => $update_data['auto_update'],
+            ));
         }
         
         if (isset($data['last_commit_hash'])) {
@@ -251,7 +290,11 @@ class Repository_Manager {
             return new \WP_Error('db_error', __('Failed to update repository.', GITHUB_PUSH_TEXT_DOMAIN));
         }
         
-        $this->logger->log('info', 'Repository updated', array('id' => $id));
+        $this->logger->log('info', 'Repository updated', array(
+            'id' => $id,
+            'update_data' => $update_data,
+            'rows_affected' => $result,
+        ));
         
         return true;
     }

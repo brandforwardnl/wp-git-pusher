@@ -99,6 +99,10 @@ class Plugin {
         // Initialize core classes.
         $this->logger = new Logger();
         $this->repository_manager = new Repository_Manager($this->logger);
+        
+        // Run migration to ensure database is up to date.
+        Repository_Manager::migrate_table();
+        
         $this->github_api = new Github_API($this->logger);
         $this->updater = new Updater($this->github_api, $this->repository_manager, $this->logger);
         $this->webhook_handler = new Webhook_Handler($this->updater, $this->repository_manager, $this->logger);
@@ -697,6 +701,7 @@ class Plugin {
      */
     public static function activate() {
         Repository_Manager::create_table();
+        Repository_Manager::migrate_table();
         
         // Set default options.
         if (!get_option('github_push_update_interval')) {

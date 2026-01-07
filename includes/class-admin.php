@@ -279,6 +279,8 @@ class Admin {
                 'plugin_slug' => $plugin_slug,
                 'install_path' => $install_path,
                 'use_releases' => $use_releases,
+                'item_type' => $item_type,
+                'auto_update' => $auto_update,
             ));
             
             // Validate repository.
@@ -317,6 +319,8 @@ class Admin {
                     'plugin_slug' => $plugin_slug,
                     'install_path' => $install_path,
                     'use_releases' => $use_releases,
+                    'item_type' => $item_type,
+                    'auto_update' => $auto_update,
                 ),
             ));
             
@@ -409,6 +413,11 @@ class Admin {
         $update_data['use_releases'] = $use_releases;
         $update_data['item_type'] = $item_type;
         $update_data['auto_update'] = $auto_update;
+        
+        $this->logger->log('info', 'Updating repository', array(
+            'repo_id' => $repo_id,
+            'update_data' => $update_data,
+        ));
         
         $result = $this->repository_manager->update($repo_id, $update_data);
         
