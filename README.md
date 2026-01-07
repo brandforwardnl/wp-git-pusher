@@ -41,32 +41,6 @@ Install and update WordPress plugins and themes directly from GitHub repositorie
    - Slug
    - Update method (Releases or Branch)
 
-## Version Bumping
-
-When making changes, use the version bump script:
-
-```bash
-# Patch version (bug fixes)
-./bump-version.sh patch "Fixed bug in version selection"
-
-# Minor version (new features)
-./bump-version.sh minor "Added new feature"
-
-# Major version (breaking changes)
-./bump-version.sh major "Major refactoring"
-```
-
-The script will:
-- Update the version in `github-push.php`
-- Add an entry to `CHANGELOG.md`
-- Prepare the commit
-
-Then commit and push:
-```bash
-git add .
-git commit -m "Bump version to X.Y.Z"
-git push
-```
 
 ## Changelog
 
