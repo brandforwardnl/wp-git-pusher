@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-01-06
+
+### Added
+- Version selection functionality (previously called rollback)
+- CHANGELOG.md for tracking changes
+- README.md with project documentation
+- .gitignore file
+
+### Changed
+- Renamed "Rollback" to "Select Version" throughout the interface
+- Improved user-facing terminology for version management
+
 ## [1.0.0] - 2026-01-06
 
 ### Added
