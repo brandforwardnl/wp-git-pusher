@@ -340,6 +340,35 @@
             $('#github_push_webhook_secret').val(secret);
         });
         
+        // Handle select version from plugins page.
+        $(document).on('click', '.github-push-select-version-plugins-page', function(e) {
+            e.preventDefault();
+            var $link = $(this);
+            var repoId = $link.data('repo-id');
+            var pluginFile = $link.data('plugin-file');
+            
+            // Fetch versions and show modal (reuse existing rollback modal).
+            $.ajax({
+                url: githubPush.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'github_push_get_versions',
+                    nonce: githubPush.nonce,
+                    repo_id: repoId
+                },
+                success: function(response) {
+                    if (response.success && response.data.versions) {
+                        showRollbackModal(repoId, response.data.versions);
+                    } else {
+                        alert('Error: ' + (response.data.message || 'Could not fetch versions.'));
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while fetching versions.');
+                }
+            });
+        });
+        
         // Handle view changes button.
         $(document).on('click', '.github-push-view-changes', function(e) {
             e.preventDefault();

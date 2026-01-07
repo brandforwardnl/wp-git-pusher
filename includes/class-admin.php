@@ -197,7 +197,8 @@ class Admin {
      * @param string $hook Current admin page hook.
      */
     public function enqueue_scripts($hook) {
-        if (strpos($hook, 'github-push') === false) {
+        // Load on GitHub Push pages and plugins page.
+        if (strpos($hook, 'github-push') === false && $hook !== 'plugins.php') {
             return;
         }
         

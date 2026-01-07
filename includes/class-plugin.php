@@ -125,6 +125,9 @@ class Plugin {
         // Integrate with WordPress plugin update API.
         add_filter('pre_set_site_transient_update_plugins', array($this, 'check_for_updates'));
         add_filter('plugins_api', array($this, 'plugin_information'), 10, 3);
+        
+        // Add version selection to plugins list.
+        add_filter('plugin_action_links', array($this, 'add_plugin_action_links'), 10, 2);
     }
     
     /**
@@ -655,6 +658,85 @@ class Plugin {
         }
         
         return $transient;
+    }
+    
+    /**
+     * Get repository for a plugin file.
+     *
+     * @param string $plugin_file Plugin file path (e.g., 'plugin-slug/plugin.php').
+     * @return object|null Repository object or null if not found.
+     */
+    private function get_repository_for_plugin($plugin_file) {
+        $repos = $this->repository_manager->get_all();
+        
+        foreach ($repos as $repo) {
+            // Skip themes.
+            if (isset($repo->item_type) && $repo->item_type === 'theme') {
+                continue;
+            }
+            
+            if (empty($repo->plugin_slug)) {
+                continue;
+            }
+            
+            // Check if plugin file matches this repository.
+            // WordPress uses format: 'plugin-slug/plugin.php'
+            $plugin_dir = dirname($plugin_file);
+            
+            // Direct match: plugin-slug matches repo slug.
+            if ($plugin_dir === $repo->plugin_slug) {
+                return $repo;
+            }
+            
+            // Check by install path - get the actual plugin directory name.
+            $install_dir = basename($repo->install_path);
+            if ($plugin_dir === $install_dir) {
+                return $repo;
+            }
+            
+            // Also check by constructing expected file path.
+            $main_file = $this->updater->get_plugin_main_file($repo->plugin_slug, $repo->install_path);
+            if ($main_file) {
+                $expected_file = $repo->plugin_slug . '/' . $main_file;
+                if ($plugin_file === $expected_file) {
+                    return $repo;
+                }
+                
+                // Also check with install directory name.
+                $expected_file_alt = $install_dir . '/' . $main_file;
+                if ($plugin_file === $expected_file_alt) {
+                    return $repo;
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Add action links to plugins list for GitHub Push managed plugins.
+     *
+     * @param array  $actions Existing action links.
+     * @param string $plugin_file Plugin file path.
+     * @return array Modified action links.
+     */
+    public function add_plugin_action_links($actions, $plugin_file) {
+        $repo = $this->get_repository_for_plugin($plugin_file);
+        
+        if (!$repo) {
+            return $actions;
+        }
+        
+        // Add "Select Version" link.
+        $select_version_url = admin_url('admin.php?page=github-push&select_version=' . $repo->id);
+        $actions['github_push_select_version'] = sprintf(
+            '<a href="#" class="github-push-select-version-plugins-page" data-repo-id="%d" data-plugin-file="%s">%s</a>',
+            esc_attr($repo->id),
+            esc_attr($plugin_file),
+            esc_html__('Select Version', GITHUB_PUSH_TEXT_DOMAIN)
+        );
+        
+        return $actions;
     }
     
     /**
