@@ -799,6 +799,7 @@ class Admin {
                         </th>
                         <td>
                             <input type="text" id="github_push_webhook_secret" name="github_push_webhook_secret" value="<?php echo esc_attr($webhook_secret); ?>" class="regular-text">
+                            <button type="button" id="generate-webhook-secret" class="button"><?php esc_html_e('Generate Random Secret', GITHUB_PUSH_TEXT_DOMAIN); ?></button>
                             <p class="description">
                                 <?php esc_html_e('Secret for webhook signature verification. Leave empty to disable signature verification (not recommended).', GITHUB_PUSH_TEXT_DOMAIN); ?>
                                 <br>

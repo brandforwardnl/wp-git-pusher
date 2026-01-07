@@ -325,6 +325,21 @@
             }
         });
         
+        // Generate random webhook secret.
+        $('#generate-webhook-secret').on('click', function(e) {
+            e.preventDefault();
+            
+            // Generate a random secret (32 characters, alphanumeric + special chars)
+            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            var secret = '';
+            for (var i = 0; i < 32; i++) {
+                secret += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            // Fill the webhook secret field
+            $('#github_push_webhook_secret').val(secret);
+        });
+        
         // Handle view changes button.
         $(document).on('click', '.github-push-view-changes', function(e) {
             e.preventDefault();
