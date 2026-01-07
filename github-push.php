@@ -3,7 +3,7 @@
  * Plugin Name: Github Push
  * Plugin URI:  https://brandforward.nl
  * Description: Install and update WordPress plugins directly from GitHub repositories.
- * Version:     1.0.2
+ * Version:     1.0.3
  * Author:      Brandforward
  * Author URI:  https://brandforward.nl
  * Text Domain: github-push
@@ -15,7 +15,7 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Brandforward\GithubPush
- * @version 1.0.2
+ * @version 1.0.3
  * @author Brandforward
  * @copyright 2025 Brandforward
  * @license GPL-2.0-or-later
@@ -27,7 +27,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants.
-define('GITHUB_PUSH_VERSION', '1.0.2');
+define('GITHUB_PUSH_VERSION', '1.0.3');
 define('GITHUB_PUSH_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('GITHUB_PUSH_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('GITHUB_PUSH_PLUGIN_BASENAME', plugin_basename(__FILE__));

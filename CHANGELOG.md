@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-01-07
+
+### Added
+- Per-repository auto-update setting (enable/disable webhook auto-updates per repository)
+- Random webhook secret generator button in settings
+- Database migration system to automatically add new columns
+- Enhanced webhook logging for better debugging
+
+### Fixed
+- Auto-update checkbox not saving when editing repositories
+- Webhook content type handling (now properly supports application/json)
+- Improved webhook payload parsing for different content types
+
+### Changed
+- Webhook handler now checks per-repository auto-update setting before updating
+- Improved webhook documentation in settings page
+
 ## [1.0.2] - 2026-01-07
 
 ### Added
