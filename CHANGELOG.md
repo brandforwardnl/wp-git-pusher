@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-01-07
+
+### Added
+- Random webhook secret generator button in settings
+- Improved version selection to prioritize releases and tags over commits
+
+### Changed
+- Version selection modal now shows releases/tags first, then falls back to commits
+- Added "Type" column in version selection to distinguish between releases, tags, and commits
+
 ## [1.0.1] - 2026-01-06
 
 ### Added
