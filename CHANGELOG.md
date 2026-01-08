@@ -47,6 +47,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.5] - 2025-01-08
+
+### Changed
+- Changed "Get Subscription" button text to "Upgrade now" in license banner
+- Moved help section from WordPress help tabs to dedicated submenu page under WP Git Pusher
+
+### Fixed
+- Fixed critical error: Added missing has_valid_license() method in Admin class
+- Improved error handling for repository privacy checks (handles WP_Error responses)
+
 ## [1.0.3] - 2026-01-07
 
 ### Added
