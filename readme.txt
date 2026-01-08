@@ -8,7 +8,7 @@ Stable tag: 1.0.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Install and update WordPress plugins directly from GitHub repositories.
+Install and update WordPress plugins and themes directly from GitHub repositories. Features: automatic updates, webhook support, version selection, comprehensive logging. Premium subscription unlocks private repository access, priority email support, and full functionality. Upgrade at coderz.store.
 
 == Description ==
 
