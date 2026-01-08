@@ -27,6 +27,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2025-01-08
+
+### Changed
+- Plugin renamed from "Github Push" to "WP Git Pusher"
+- Author changed from "Brandforward" to "Coderz"
+- Plugin URI and Author URI updated to https://coderz.store
+- Expanded plugin description with comprehensive features list
+- Added premium subscription benefits section to description
+
+### Security
+- Fixed SQL injection vulnerability in migrate_table() method
+- Improved webhook secret verification (now rejects requests without secret)
+- Fixed XSS vulnerability in error messages (using wp_kses_post)
+- Updated .htaccess syntax for log directory protection (Apache 2.4+ compatible)
+
+### Removed
+- Removed all licensing-related logging from FluentLicensing and LicenseSettings classes
+
 ## [Unreleased]
 
 ## [1.0.3] - 2026-01-07
