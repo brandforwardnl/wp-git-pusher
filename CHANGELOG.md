@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] - 2025-01-08
+
+### Added
+- FluentCart licensing integration with activation and deactivation functionality
+- Separate License menu page under GitHub Push for license management
+- License validation for private repositories (requires valid license to add private repos)
+- Confetti celebration effect using canvas-confetti when license is activated
+- License display with renewal date and trial status information
+- Comprehensive logging for all licensing operations (activation, deactivation, status checks, API requests)
+- "Upgrade for private repos" button for private repositories when license is invalid
+
+### Changed
+- Updated store URL to https://coderz.store
+- Updated account URL to https://coderz.store/account/
+- Hardcoded license item_id to 93
+- Improved license activation success message with gradient background styling
+- Red deactivate license button with white text
+
+### Fixed
+- Fixed license expiration date display format (DD-MM-YYYY)
+- Fixed license initialization to prevent errors when item_id is not configured
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
