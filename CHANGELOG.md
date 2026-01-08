@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [1.0.6] - 2025-01-08
+
+### Changed
+- Plugin renamed from "Github Push" to "WP Git Pusher"
+- Author changed from "Brandforward" to "Coderz"
+- Plugin URI and Author URI updated to https://coderz.store
+- Expanded plugin description with comprehensive features list
+- Added premium subscription benefits section to description
+
+### Security
+- Fixed SQL injection vulnerability in migrate_table() method
+- Improved webhook secret verification (now rejects requests without secret)
+- Fixed XSS vulnerability in error messages (using wp_kses_post)
+- Updated .htaccess syntax for log directory protection (Apache 2.4+ compatible)
+
+### Removed
+- Removed all licensing-related logging from FluentLicensing and LicenseSettings classes
+
+## [1.0.5] - 2025-01-08
+
+### Changed
+- Changed "Get Subscription" button text to "Upgrade now" in license banner
+- Moved help section from WordPress help tabs to dedicated submenu page under WP Git Pusher
+
+### Fixed
+- Fixed critical error: Added missing has_valid_license() method in Admin class
+- Improved error handling for repository privacy checks (handles WP_Error responses)
+
 ## [1.0.4] - 2025-01-08
 
 ### Added
@@ -23,39 +56,6 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Fixed license expiration date display format (DD-MM-YYYY)
 - Fixed license initialization to prevent errors when item_id is not configured
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [1.0.6] - 2025-01-08
-
-### Changed
-- Plugin renamed from "Github Push" to "WP Git Pusher"
-- Author changed from "Brandforward" to "Coderz"
-- Plugin URI and Author URI updated to https://coderz.store
-- Expanded plugin description with comprehensive features list
-- Added premium subscription benefits section to description
-
-### Security
-- Fixed SQL injection vulnerability in migrate_table() method
-- Improved webhook secret verification (now rejects requests without secret)
-- Fixed XSS vulnerability in error messages (using wp_kses_post)
-- Updated .htaccess syntax for log directory protection (Apache 2.4+ compatible)
-
-### Removed
-- Removed all licensing-related logging from FluentLicensing and LicenseSettings classes
-
-## [Unreleased]
-
-## [1.0.5] - 2025-01-08
-
-### Changed
-- Changed "Get Subscription" button text to "Upgrade now" in license banner
-- Moved help section from WordPress help tabs to dedicated submenu page under WP Git Pusher
-
-### Fixed
-- Fixed critical error: Added missing has_valid_license() method in Admin class
-- Improved error handling for repository privacy checks (handles WP_Error responses)
 
 ## [1.0.3] - 2026-01-07
 
