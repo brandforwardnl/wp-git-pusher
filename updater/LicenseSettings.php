@@ -99,14 +99,7 @@ class LicenseSettings
             ], 422);
         }
         
-        if ($this->logger) {
-            $this->logger->log('info', 'License activation AJAX request received');
-        }
-        
         if (!current_user_can('manage_options')) {
-            if ($this->logger) {
-                $this->logger->log('warning', 'License activation denied: insufficient permissions');
-            }
             wp_send_json([
                 'message' => 'Sorry! You do not have permission to perform this action.',
             ], 422);
@@ -116,18 +109,12 @@ class LicenseSettings
         $licenseKey = isset($_POST['license_key']) ? sanitize_text_field($_POST['license_key']) : '';
 
         if (!wp_verify_nonce($nonce, 'fct_license_nonce')) {
-            if ($this->logger) {
-                $this->logger->log('error', 'License activation failed: invalid nonce');
-            }
             wp_send_json([
                 'message' => 'Invalid nonce. Please try again.',
             ], 422);
         }
 
         if (!$licenseKey) {
-            if ($this->logger) {
-                $this->logger->log('error', 'License activation failed: no license key provided');
-            }
             wp_send_json([
                 'message' => 'Please provide a valid license key.',
             ], 422);
@@ -136,11 +123,6 @@ class LicenseSettings
         $currentLicense = $this->licensing->getStatus();
 
         if ($currentLicense['status'] === 'active' && $currentLicense['license_key'] === $licenseKey) {
-            if ($this->logger) {
-                $this->logger->log('info', 'License activation skipped: already active', array(
-                    'license_key' => substr($licenseKey, 0, 8) . '...',
-                ));
-            }
             wp_send_json([
                 'message' => 'This license key is already active.',
             ], 200);
@@ -149,12 +131,6 @@ class LicenseSettings
         $activated = $this->licensing->activate($licenseKey);
 
         if (is_wp_error($activated)) {
-            if ($this->logger) {
-                $this->logger->log('error', 'License activation failed (SDK error)', array(
-                    'error_code' => $activated->get_error_code(),
-                    'error_message' => $activated->get_error_message(),
-                ));
-            }
             wp_send_json([
                 'message' => $activated->get_error_message(),
                 'status'  => 'api_error'
@@ -165,14 +141,6 @@ class LicenseSettings
         if (isset($activated['status']) && $activated['status'] !== 'valid' && $activated['status'] !== 'active') {
             $errorMessage = isset($activated['message']) ? $activated['message'] : 'License activation failed. Please check your license key.';
             
-            if ($this->logger) {
-                $this->logger->log('error', 'License activation failed: invalid status', array(
-                    'status' => $activated['status'] ?? 'unknown',
-                    'message' => $errorMessage,
-                    'full_response' => $activated,
-                ));
-            }
-            
             wp_send_json([
                 'message' => $errorMessage,
                 'status'  => $activated['status'] ?? 'unknown'
@@ -181,23 +149,10 @@ class LicenseSettings
         
         // Also check if it's a WP_Error (should be caught above, but double-check).
         if (is_wp_error($activated)) {
-            if ($this->logger) {
-                $this->logger->log('error', 'License activation returned WP_Error', array(
-                    'error_code' => $activated->get_error_code(),
-                    'error_message' => $activated->get_error_message(),
-                    'error_data' => $activated->get_error_data(),
-                ));
-            }
             wp_send_json([
                 'message' => $activated->get_error_message(),
                 'status'  => 'api_error'
             ], 422);
-        }
-
-        if ($this->logger) {
-            $this->logger->log('info', 'License activation AJAX completed successfully', array(
-                'status' => $activated['status'],
-            ));
         }
 
         return wp_send_json([
@@ -214,14 +169,7 @@ class LicenseSettings
             ], 422);
         }
         
-        if ($this->logger) {
-            $this->logger->log('info', 'License deactivation AJAX request received');
-        }
-        
         if (!current_user_can('manage_options')) {
-            if ($this->logger) {
-                $this->logger->log('warning', 'License deactivation denied: insufficient permissions');
-            }
             wp_send_json([
                 'message' => 'Sorry! You do not have permission to perform this action.',
             ], 422);
@@ -230,9 +178,6 @@ class LicenseSettings
         $nonce = isset($_POST['_nonce']) ? sanitize_text_field($_POST['_nonce']) : '';
 
         if (!wp_verify_nonce($nonce, 'fct_license_nonce')) {
-            if ($this->logger) {
-                $this->logger->log('error', 'License deactivation failed: invalid nonce');
-            }
             wp_send_json([
                 'message' => 'Invalid nonce. Please try again.',
             ], 422);
@@ -241,19 +186,6 @@ class LicenseSettings
         $deactivated = $this->licensing->deactivate();
         
         $remoteDeactivated = !is_wp_error($deactivated);
-        
-        if ($this->logger) {
-            if ($remoteDeactivated) {
-                $this->logger->log('info', 'License deactivation AJAX completed successfully', array(
-                    'remote_deactivated' => true,
-                ));
-            } else {
-                $this->logger->log('error', 'License deactivation AJAX completed with errors', array(
-                    'error_code' => $deactivated->get_error_code(),
-                    'error_message' => $deactivated->get_error_message(),
-                ));
-            }
-        }
 
         wp_send_json([
             'message'            => 'License deactivated successfully.',
@@ -269,14 +201,7 @@ class LicenseSettings
             ], 422);
         }
         
-        if ($this->logger) {
-            $this->logger->log('info', 'License status check AJAX request received');
-        }
-        
         if (!current_user_can('manage_options')) {
-            if ($this->logger) {
-                $this->logger->log('warning', 'License status check denied: insufficient permissions');
-            }
             wp_send_json([
                 'message' => 'Sorry! You do not have permission to perform this action.',
             ], 422);
@@ -285,9 +210,6 @@ class LicenseSettings
         $nonce = isset($_POST['_nonce']) ? sanitize_text_field($_POST['_nonce']) : '';
 
         if (!wp_verify_nonce($nonce, 'fct_license_nonce')) {
-            if ($this->logger) {
-                $this->logger->log('error', 'License status check failed: invalid nonce');
-            }
             wp_send_json([
                 'message' => 'Invalid nonce. Please try again.',
             ], 422);
@@ -296,12 +218,6 @@ class LicenseSettings
         $status = $this->licensing->getStatus(true);
 
         if (is_wp_error($status)) {
-            if ($this->logger) {
-                $this->logger->log('error', 'License status check failed', array(
-                    'error_code' => $status->get_error_code(),
-                    'error_message' => $status->get_error_message(),
-                ));
-            }
             wp_send_json([
                 'error_notice' => $status->get_error_message(),
             ]);

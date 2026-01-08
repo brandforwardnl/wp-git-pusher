@@ -38,11 +38,6 @@ class FluentLicensing
         // Set logger if provided.
         if (isset($config['logger']) && $config['logger'] instanceof \Brandforward\GithubPush\Logger) {
             $this->logger = $config['logger'];
-            $this->logger->log('info', 'FluentLicensing initialized', array(
-                'slug' => $this->config['slug'],
-                'settings_key' => $this->settingsKey,
-                'api_url' => $this->config['api_url'] ?? '',
-            ));
         }
 
         if (empty($config['store_url'])) {
@@ -97,17 +92,7 @@ class FluentLicensing
 
     public function activate($licenseKey = '')
     {
-        if ($this->logger) {
-            $this->logger->log('info', 'License activation started', array(
-                'license_key_provided' => !empty($licenseKey),
-                'license_key_length' => strlen($licenseKey),
-            ));
-        }
-        
         if (!$licenseKey) {
-            if ($this->logger) {
-                $this->logger->log('error', 'License activation failed: license key missing');
-            }
             return new \WP_Error('license_key_missing', 'License key is required for activation.');
         }
 
@@ -118,13 +103,6 @@ class FluentLicensing
         ]);
 
         if (is_wp_error($response)) {
-            if ($this->logger) {
-                $this->logger->log('error', 'License activation API error', array(
-                    'error_code' => $response->get_error_code(),
-                    'error_message' => $response->get_error_message(),
-                    'error_data' => $response->get_error_data(),
-                ));
-            }
             return $response; // Return the error response if there is an error.
         }
         
@@ -132,13 +110,6 @@ class FluentLicensing
         // Check if the response indicates an error.
         if (isset($response['status']) && $response['status'] !== 'valid' && $response['status'] !== 'active') {
             $errorMessage = isset($response['message']) ? $response['message'] : 'License activation failed.';
-            if ($this->logger) {
-                $this->logger->log('error', 'License activation failed: invalid status in response', array(
-                    'status' => $response['status'],
-                    'message' => $errorMessage,
-                    'full_response' => $response,
-                ));
-            }
             return new \WP_Error('license_activation_failed', $errorMessage, $response);
         }
 
@@ -156,12 +127,6 @@ class FluentLicensing
 
         // Save the license data to the database.
         update_option($this->settingsKey, $saveData, false);
-        
-        if ($this->logger) {
-            $this->logger->log('info', 'License activated successfully', array(
-                'status' => $saveData['status'],
-            ));
-        }
 
         return $saveData; // Return the saved data.
     }
@@ -170,42 +135,17 @@ class FluentLicensing
     {
         $currentKey = $this->getCurrentLicenseKey();
         
-        if ($this->logger) {
-            $this->logger->log('info', 'License deactivation started', array(
-                'has_license_key' => !empty($currentKey),
-            ));
-        }
-        
         $deactivated = $this->apiRequest('deactivate_license', [
             'license_key' => $currentKey
         ]);
 
         delete_option($this->settingsKey); // Remove the license data from the database.
-        
-        if ($this->logger) {
-            if (is_wp_error($deactivated)) {
-                $this->logger->log('error', 'License deactivation API error', array(
-                    'error_code' => $deactivated->get_error_code(),
-                    'error_message' => $deactivated->get_error_message(),
-                ));
-            } else {
-                $this->logger->log('info', 'License deactivated successfully', array(
-                    'remote_deactivated' => !is_wp_error($deactivated),
-                ));
-            }
-        }
 
         return $deactivated;
     }
 
     public function getStatus($remoteFetch = false)
     {
-        if ($this->logger) {
-            $this->logger->log('info', 'Getting license status', array(
-                'remote_fetch' => $remoteFetch,
-            ));
-        }
-        
         $currentLicense = get_option($this->settingsKey, []);
         if (!$currentLicense || !is_array($currentLicense) || empty($currentLicense['license_key'])) {
             $currentLicense = [
@@ -219,20 +159,11 @@ class FluentLicensing
                 'is_trial'        => false,
                 'trial_ends_at'   => '',
             ];
-            
-            if ($this->logger) {
-                $this->logger->log('info', 'License status: unregistered');
-            }
 
             return $currentLicense;
         }
 
         if (!$remoteFetch) {
-            if ($this->logger) {
-                $this->logger->log('info', 'License status retrieved from cache', array(
-                    'status' => $currentLicense['status'] ?? 'unknown',
-                ));
-            }
             return $currentLicense; // Return the current license status without fetching from the API.
         }
 
@@ -244,12 +175,6 @@ class FluentLicensing
         ]);
 
         if (is_wp_error($remoteStatus)) {
-            if ($this->logger) {
-                $this->logger->log('error', 'License status check API error', array(
-                    'error_code' => $remoteStatus->get_error_code(),
-                    'error_message' => $remoteStatus->get_error_message(),
-                ));
-            }
             return $remoteStatus; // Return the error response if there is an error.
         }
 
@@ -299,12 +224,6 @@ class FluentLicensing
         if ($errorType) {
             $currentLicense['error_type'] = $errorType;
             $currentLicense['error_message'] = $remoteStatus['message'];
-        }
-        
-        if ($this->logger) {
-            $this->logger->log('info', 'License status retrieved from remote', array(
-                'status' => $currentLicense['status'] ?? 'unknown',
-            ));
         }
 
         return $currentLicense;

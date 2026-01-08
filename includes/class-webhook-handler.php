@@ -112,9 +112,12 @@ class Webhook_Handler {
         $secret = get_option('github_push_webhook_secret', '');
         
         if (empty($secret)) {
-            // If no secret is configured, allow the request (less secure but functional).
-            $this->logger->log('warning', 'Webhook request without secret configured', array());
-            return true;
+            // If no secret is configured, reject the request for security.
+            // Users should configure a secret for production use.
+            $this->logger->log('warning', 'Webhook request rejected: no secret configured', array(
+                'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+            ));
+            return false;
         }
         
         $signature = $request->get_header('X-Hub-Signature-256');

@@ -35,8 +35,14 @@ class Logger {
         if (!file_exists($this->log_dir)) {
             wp_mkdir_p($this->log_dir);
             
-            // Create .htaccess to protect logs.
-            $htaccess_content = "Order deny,allow\nDeny from all\n";
+            // Create .htaccess to protect logs (modern Apache 2.4+ syntax).
+            $htaccess_content = "<IfModule mod_authz_core.c>\n";
+            $htaccess_content .= "    Require all denied\n";
+            $htaccess_content .= "</IfModule>\n";
+            $htaccess_content .= "<IfModule !mod_authz_core.c>\n";
+            $htaccess_content .= "    Order deny,allow\n";
+            $htaccess_content .= "    Deny from all\n";
+            $htaccess_content .= "</IfModule>\n";
             file_put_contents($this->log_dir . '/.htaccess', $htaccess_content);
             
             // Create index.php to prevent directory listing.

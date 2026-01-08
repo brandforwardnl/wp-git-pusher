@@ -1185,7 +1185,8 @@ class Admin {
             $error = sanitize_text_field($_GET['error']);
             $message = isset($error_messages[$error]) ? $error_messages[$error] : __('An error occurred.', GITHUB_PUSH_TEXT_DOMAIN);
             
-            echo '<div class="notice notice-error"><p>' . $message . '</p></div>';
+            // Use wp_kses_post to allow HTML in error messages (like links) but prevent XSS.
+            echo '<div class="notice notice-error"><p>' . wp_kses_post($message) . '</p></div>';
         }
     }
     

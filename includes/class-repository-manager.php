@@ -85,14 +85,19 @@ class Repository_Manager {
         $table_name = $wpdb->prefix . 'github_push_repositories';
         
         // Check if auto_update column exists.
+        // Table name is safe (from $wpdb->prefix + constant string), but use esc_sql for extra safety.
+        $table_name_escaped = esc_sql($table_name);
         $column_exists = $wpdb->get_results($wpdb->prepare(
-            "SHOW COLUMNS FROM {$table_name} LIKE %s",
+            "SHOW COLUMNS FROM {$table_name_escaped} LIKE %s",
             'auto_update'
         ));
         
         if (empty($column_exists)) {
             // Add auto_update column.
-            $wpdb->query("ALTER TABLE {$table_name} ADD COLUMN auto_update tinyint(1) NOT NULL DEFAULT 0 AFTER item_type");
+            // Use $wpdb->prefix which is safe, and table name is from our own constant.
+            // Still use esc_sql for extra safety.
+            $table_name_escaped = esc_sql($table_name);
+            $wpdb->query("ALTER TABLE {$table_name_escaped} ADD COLUMN auto_update tinyint(1) NOT NULL DEFAULT 0 AFTER item_type");
         }
     }
     

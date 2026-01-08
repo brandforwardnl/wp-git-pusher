@@ -155,10 +155,6 @@ class Plugin {
         // Hardcoded item_id for Github Push plugin.
         $item_id = '93';
         
-        $this->logger->log('info', 'Initializing licensing', array(
-            'item_id' => $item_id,
-            'api_url' => 'https://coderz.store',
-        ));
         
         // Initialize FluentLicensing.
         $licensing_instance = new FluentLicensing();
@@ -173,7 +169,6 @@ class Plugin {
             'slug'          => 'github-push',
             'settings_key'  => 'github_push_license_info',
             'activate_url'  => admin_url('admin.php?page=github-push-license'),
-            'logger'        => $this->logger, // Pass logger instance for licensing operations.
         ));
         
         // Initialize LicenseSettings.
@@ -187,7 +182,6 @@ class Plugin {
             'plugin_name'   => 'Github Push',
             'purchase_url'  => 'https://coderz.store',
             'account_url'   => 'https://coderz.store/account/',
-            'logger'        => $this->logger, // Pass logger instance for license settings operations.
         ));
         
         // Add license page as a separate submenu item.
@@ -201,9 +195,6 @@ class Plugin {
                 'position'    => 20, // Position after Settings and Logs.
             ));
             
-            $this->logger->log('info', 'License menu page registered', array(
-                'menu_slug' => 'github-push-license',
-            ));
         }
     }
     
