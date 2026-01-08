@@ -152,7 +152,7 @@ class Plugin {
      * Initialize licensing.
      */
     public function init_licensing() {
-        // Hardcoded item_id for Github Push plugin.
+        // Hardcoded item_id for WP Git Pusher plugin.
         $item_id = '93';
         
         
@@ -165,7 +165,7 @@ class Plugin {
             'store_url'     => 'https://coderz.store',
             'purchase_url'  => 'https://coderz.store',
             'item_id'       => $item_id,
-            'plugin_title'  => 'Github Push',
+            'plugin_title'  => 'WP Git Pusher',
             'slug'          => 'github-push',
             'settings_key'  => 'github_push_license_info',
             'activate_url'  => admin_url('admin.php?page=github-push-license'),
@@ -177,9 +177,9 @@ class Plugin {
             'menu_title'    => __('License', GITHUB_PUSH_TEXT_DOMAIN),
             'page_title'    => __('License Settings', GITHUB_PUSH_TEXT_DOMAIN),
             'title'         => __('License Settings', GITHUB_PUSH_TEXT_DOMAIN),
-            'description'   => __('Manage your license settings for Github Push.', GITHUB_PUSH_TEXT_DOMAIN),
+            'description'   => __('Manage your license settings for WP Git Pusher.', GITHUB_PUSH_TEXT_DOMAIN),
             'license_key'   => __('License Key', GITHUB_PUSH_TEXT_DOMAIN),
-            'plugin_name'   => 'Github Push',
+            'plugin_name'   => 'WP Git Pusher',
             'purchase_url'  => 'https://coderz.store',
             'account_url'   => 'https://coderz.store/account/',
         ));
@@ -782,7 +782,7 @@ class Plugin {
     }
     
     /**
-     * Add action links to plugins list for GitHub Push managed plugins.
+     * Add action links to plugins list for WP Git Pusher managed plugins.
      *
      * @param array  $actions Existing action links.
      * @param string $plugin_file Plugin file path.

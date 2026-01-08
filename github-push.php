@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: Github Push
- * Plugin URI:  https://brandforward.nl
- * Description: Install and update WordPress plugins directly from GitHub repositories.
- * Version:     1.0.5
- * Author:      Brandforward
- * Author URI:  https://brandforward.nl
+ * Plugin Name: WP Git Pusher
+ * Plugin URI:  https://coderz.store
+ * Description: Install and update WordPress plugins and themes directly from GitHub repositories. Features: automatic updates via cron, webhook support for instant updates, branch-based and release-based updates, version selection, comprehensive logging, and full WordPress integration. Premium subscription unlocks private repository access, priority email support, and full plugin functionality. Upgrade at coderz.store.
+ * Version:     1.0.6
+ * Author:      Coderz
+ * Author URI:  https://coderz.store
  * Text Domain: github-push
  * Domain Path: /languages
  * Requires at least: 5.0
@@ -15,9 +15,9 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package Brandforward\GithubPush
- * @version 1.0.5
- * @author Brandforward
- * @copyright 2025 Brandforward
+ * @version 1.0.6
+ * @author Coderz
+ * @copyright 2025 Coderz
  * @license GPL-2.0-or-later
  */
 
@@ -27,7 +27,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants.
-define('GITHUB_PUSH_VERSION', '1.0.5');
+define('GITHUB_PUSH_VERSION', '1.0.6');
 define('GITHUB_PUSH_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('GITHUB_PUSH_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('GITHUB_PUSH_PLUGIN_BASENAME', plugin_basename(__FILE__));

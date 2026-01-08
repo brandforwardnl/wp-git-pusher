@@ -1,10 +1,10 @@
-=== Github Push ===
-Contributors: brandforward
+=== WP Git Pusher ===
+Contributors: coderz
 Tags: github, plugins, updates, deployment
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,33 +12,73 @@ Install and update WordPress plugins directly from GitHub repositories.
 
 == Description ==
 
-Github Push is a powerful WordPress plugin that allows you to install and manage WordPress plugins directly from GitHub repositories. It provides automatic updates, webhook support, and seamless integration with the WordPress plugin update system.
+WP Git Pusher is a powerful WordPress plugin that allows you to install and manage WordPress plugins and themes directly from GitHub repositories. It provides automatic updates, webhook support, and seamless integration with the WordPress plugin update system.
+
+**Key Features:**
+* Install plugins and themes from GitHub repositories (public or private with subscription)
+* Automatic update checking via WordPress cron
+* Webhook support for instant updates on push or release events
+* Support for both branch-based (HEAD) and release-based (tagged) updates
+* Full integration with WordPress plugin update system
+* Version selection and rollback capabilities
+* Per-repository auto-update settings
+* Comprehensive logging system for troubleshooting
+* Custom install paths and plugin slugs
+* Secure webhook signature verification
+* GitHub API rate limit handling
+* Backup and restore functionality
+
+**Premium Subscription Benefits:**
+With a WP Git Pusher subscription, you unlock premium features:
+* **Private Repository Access**: Install and manage plugins from your private GitHub repositories
+* **Priority Email Support**: Get fast, dedicated support from our team
+* **Full Plugin Functionality**: Access all features without limitations
+* **License Management**: Easy license activation and management through the WordPress admin
+
+Upgrade to a subscription at [https://coderz.store](https://coderz.store) to unlock these premium features.
 
 == Features ==
 
-* Install plugins from GitHub repositories (public or private)
+* Install plugins and themes from GitHub repositories
 * Automatic update checking via WordPress cron
-* Webhook support for instant updates on push/release
-* Support for both branch-based and tag-based releases
-* Secure token-based authentication for private repositories
-* Backup and version selection functionality
-* Comprehensive logging system
-* Integration with WordPress plugin update UI
+* Webhook support for instant updates on push or release events
+* Support for both branch-based (HEAD) and release-based (tagged) updates
+* Full integration with WordPress plugin update system
+* Version selection and rollback capabilities
+* Per-repository auto-update settings
+* Comprehensive logging system for troubleshooting
+* Support for both public and private repositories (with subscription)
+* Theme installation and management support
+* Custom install paths and plugin slugs
+* Secure webhook signature verification
+* GitHub API rate limit handling
+* Backup and restore functionality
 * Clean, native WordPress admin interface
+
+== Premium Subscription Benefits ==
+
+With a WP Git Pusher subscription, you unlock premium features:
+
+* **Private Repository Access**: Install and manage plugins from your private GitHub repositories
+* **Priority Email Support**: Get fast, dedicated support from our team
+* **Full Plugin Functionality**: Access all features without limitations
+* **License Management**: Easy license activation and management through the WordPress admin
+
+Upgrade to a subscription at [https://coderz.store](https://coderz.store) to unlock these premium features.
 
 == Installation ==
 
 1. Upload the plugin files to the `/wp-content/plugins/github-push` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Navigate to 'Github Push' in the admin menu to configure repositories.
+3. Navigate to 'WP Git Pusher' in the admin menu to configure repositories.
 
 == Configuration ==
 
-1. Go to Github Push > Settings
+1. Go to WP Git Pusher > Settings
 2. Enter your GitHub Personal Access Token (optional but recommended for private repos)
 3. Configure default branch and update strategy
 4. Set up webhook secret if using webhooks
-5. Add repositories via Github Push > Repositories
+5. Add repositories via WP Git Pusher > Repositories
 
 == GitHub Token Setup ==
 
@@ -46,7 +86,7 @@ To use private repositories or increase rate limits:
 
 1. Go to https://github.com/settings/tokens
 2. Generate a new token with `repo` scope (for private repos) or `public_repo` scope (for public repos only)
-3. Enter the token in Github Push > Settings
+3. Enter the token in WP Git Pusher > Settings
 
 == Webhook Setup ==
 
@@ -55,7 +95,7 @@ To use private repositories or increase rate limits:
 3. Add a new webhook with:
    - Payload URL: `https://yoursite.com/wp-json/github-push/v1/webhook`
    - Content type: `application/json`
-   - Secret: (enter the secret from Github Push settings)
+   - Secret: (enter the secret from WP Git Pusher settings)
    - Events: Select "Just the push event" or "Let me select individual events" (push and release)
 
 == Frequently Asked Questions ==
@@ -78,7 +118,7 @@ Yes, you can check for updates and install them manually from the Repositories p
 
 = Does this work with the WordPress plugin update screen? =
 
-Yes, plugins managed by Github Push appear in the standard WordPress Updates screen, allowing you to update them alongside other plugins.
+Yes, plugins managed by WP Git Pusher appear in the standard WordPress Updates screen, allowing you to update them alongside other plugins.
 
 = Why can't I see my private repositories? =
 
@@ -121,7 +161,7 @@ Backups are stored in `wp-content/github-push-backups/` and are automatically cl
 
 = How do I view logs? =
 
-Go to Github Push > Logs to see detailed logs of all operations, including API requests, installations, updates, and errors.
+Go to WP Git Pusher > Logs to see detailed logs of all operations, including API requests, installations, updates, and errors.
 
 = Can I use this with multiple GitHub accounts? =
 
@@ -151,5 +191,5 @@ For public repositories only:
 == Upgrade Notice ==
 
 = 1.0.0 =
-Initial release of Github Push.
+Initial release of WP Git Pusher.
 

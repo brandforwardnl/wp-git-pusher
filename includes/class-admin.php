@@ -98,8 +98,8 @@ class Admin {
         $icon_svg = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>';
         
         add_menu_page(
-            __('Github Push', GITHUB_PUSH_TEXT_DOMAIN),
-            __('Github Push', GITHUB_PUSH_TEXT_DOMAIN),
+            __('WP Git Pusher', GITHUB_PUSH_TEXT_DOMAIN),
+            __('WP Git Pusher', GITHUB_PUSH_TEXT_DOMAIN),
             'manage_options',
             'github-push',
             array($this, 'render_repositories_page'),
@@ -258,7 +258,7 @@ class Admin {
      * @param string $hook Current admin page hook.
      */
     public function enqueue_scripts($hook) {
-        // Load on GitHub Push pages and plugins page.
+        // Load on WP Git Pusher pages and plugins page.
         if (strpos($hook, 'github-push') === false && $hook !== 'plugins.php') {
             return;
         }
@@ -676,7 +676,7 @@ class Admin {
                         <div class="github-push-banner-icon">🚀</div>
                         <div class="github-push-banner-text">
                             <h3>Unlock Premium Features</h3>
-                            <p>Use your own <strong>private repositories</strong> and get <strong>email support</strong> with a GitHub Push subscription.</p>
+                            <p>Use your own <strong>private repositories</strong> and get <strong>email support</strong> with a WP Git Pusher subscription.</p>
                             <ul class="github-push-banner-benefits">
                                 <li>✓ Use your own private GitHub repositories</li>
                                 <li>✓ Priority email support</li>
@@ -1285,7 +1285,7 @@ class Admin {
     private function get_help_tab_content($tab) {
         switch ($tab) {
             case 'overview':
-                return '<p>' . __('Github Push allows you to install and manage WordPress plugins directly from GitHub repositories.', GITHUB_PUSH_TEXT_DOMAIN) . '</p>' .
+                return '<p>' . __('WP Git Pusher allows you to install and manage WordPress plugins directly from GitHub repositories.', GITHUB_PUSH_TEXT_DOMAIN) . '</p>' .
                        '<h3>' . __('Key Features:', GITHUB_PUSH_TEXT_DOMAIN) . '</h3>' .
                        '<ul>' .
                        '<li>' . __('Install plugins from GitHub (public or private)', GITHUB_PUSH_TEXT_DOMAIN) . '</li>' .
@@ -1299,14 +1299,14 @@ class Admin {
             case 'setup':
                 return '<h3>' . __('Step 1: Configure GitHub Token', GITHUB_PUSH_TEXT_DOMAIN) . '</h3>' .
                        '<ol>' .
-                       '<li>' . __('Go to Github Push > Settings', GITHUB_PUSH_TEXT_DOMAIN) . '</li>' .
+                       '<li>' . __('Go to WP Git Pusher > Settings', GITHUB_PUSH_TEXT_DOMAIN) . '</li>' .
                        '<li>' . __('Create a GitHub Personal Access Token at:', GITHUB_PUSH_TEXT_DOMAIN) . ' <a href="https://github.com/settings/tokens" target="_blank">https://github.com/settings/tokens</a></li>' .
                        '<li>' . __('For private repos: Use "repo" scope (classic) or "Contents" read permission (fine-grained)', GITHUB_PUSH_TEXT_DOMAIN) . '</li>' .
                        '<li>' . __('Paste the token in Settings and click "Test Connection"', GITHUB_PUSH_TEXT_DOMAIN) . '</li>' .
                        '</ol>' .
                        '<h3>' . __('Step 2: Add Repositories', GITHUB_PUSH_TEXT_DOMAIN) . '</h3>' .
                        '<ol>' .
-                       '<li>' . __('Go to Github Push > Repositories', GITHUB_PUSH_TEXT_DOMAIN) . '</li>' .
+                       '<li>' . __('Go to WP Git Pusher > Repositories', GITHUB_PUSH_TEXT_DOMAIN) . '</li>' .
                        '<li>' . __('Click "My Repositories" to fetch from your GitHub account', GITHUB_PUSH_TEXT_DOMAIN) . '</li>' .
                        '<li>' . __('Or enter a username/organization name and click "Fetch Repositories"', GITHUB_PUSH_TEXT_DOMAIN) . '</li>' .
                        '<li>' . __('Click "Select" on a repository to auto-fill the form', GITHUB_PUSH_TEXT_DOMAIN) . '</li>' .
@@ -1335,7 +1335,7 @@ class Admin {
                        '<p><strong>' . __('Q: Can I install plugins from organizations?', GITHUB_PUSH_TEXT_DOMAIN) . '</strong></p>' .
                        '<p>' . __('A: Yes, enter the organization name in the repository selector to fetch all repositories from that organization.', GITHUB_PUSH_TEXT_DOMAIN) . '</p>' .
                        '<p><strong>' . __('Q: Where can I view logs?', GITHUB_PUSH_TEXT_DOMAIN) . '</strong></p>' .
-                       '<p>' . __('A: Go to Github Push > Logs to see detailed logs of all operations, API requests, and errors.', GITHUB_PUSH_TEXT_DOMAIN) . '</p>';
+                       '<p>' . __('A: Go to WP Git Pusher > Logs to see detailed logs of all operations, API requests, and errors.', GITHUB_PUSH_TEXT_DOMAIN) . '</p>';
             
             default:
                 return '';

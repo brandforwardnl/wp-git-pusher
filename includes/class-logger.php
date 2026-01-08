@@ -73,7 +73,7 @@ class Logger {
         
         // Also log to WordPress debug log if enabled.
         if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
-            error_log(sprintf('[Github Push %s] %s: %s', strtoupper($level), $message, json_encode($context)));
+            error_log(sprintf('[WP Git Pusher %s] %s: %s', strtoupper($level), $message, json_encode($context)));
         }
     }
     
