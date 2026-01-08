@@ -88,7 +88,6 @@ class Admin {
         add_action('admin_post_github_push_add_repo', array($this, 'handle_add_repo'));
         add_action('admin_post_github_push_edit_repo', array($this, 'handle_edit_repo'));
         add_action('admin_post_github_push_delete_repo', array($this, 'handle_delete_repo'));
-        add_action('admin_head', array($this, 'add_help_tabs'));
     }
     
     /**
@@ -133,6 +132,15 @@ class Admin {
             'manage_options',
             'github-push-logs',
             array($this, 'render_logs_page')
+        );
+        
+        add_submenu_page(
+            'github-push',
+            __('Help', GITHUB_PUSH_TEXT_DOMAIN),
+            __('Help', GITHUB_PUSH_TEXT_DOMAIN),
+            'manage_options',
+            'github-push-help',
+            array($this, 'render_help_page')
         );
         
         // License page is added by LicenseSettings, but we ensure it's available.
@@ -257,6 +265,78 @@ class Admin {
                 visibility: visible !important;
                 opacity: 1 !important;
                 display: inline !important;
+            }
+            .github-push-license-banner {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 8px;
+                padding: 20px;
+                margin: 20px 0 30px 0;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                color: #fff;
+            }
+            .github-push-banner-content {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+            .github-push-banner-icon {
+                font-size: 48px;
+                line-height: 1;
+            }
+            .github-push-banner-text {
+                flex: 1;
+                min-width: 300px;
+            }
+            .github-push-banner-text h3 {
+                margin: 0 0 10px 0;
+                color: #fff;
+                font-size: 20px;
+                font-weight: 600;
+            }
+            .github-push-banner-text p {
+                margin: 0 0 15px 0;
+                color: rgba(255, 255, 255, 0.95);
+                font-size: 14px;
+                line-height: 1.6;
+            }
+            .github-push-banner-text p strong {
+                color: #fff;
+                font-weight: 600;
+            }
+            .github-push-banner-benefits {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            .github-push-banner-benefits li {
+                color: rgba(255, 255, 255, 0.95);
+                font-size: 13px;
+            }
+            .github-push-banner-action {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                min-width: 180px;
+            }
+            .github-push-banner-action .button {
+                white-space: nowrap;
+                text-align: center;
+            }
+            @media (max-width: 782px) {
+                .github-push-banner-content {
+                    flex-direction: column;
+                    text-align: center;
+                }
+                .github-push-banner-action {
+                    width: 100%;
+                }
+                .github-push-banner-action .button {
+                    width: 100%;
+                }
             }
         ';
         wp_add_inline_style('github-push-admin', $inline_css);
@@ -529,11 +609,39 @@ class Admin {
         $edit_id = isset($_GET['edit']) ? absint($_GET['edit']) : 0;
         $edit_repo = $edit_id ? $this->repository_manager->get($edit_id) : null;
         
+        // Check if license is active
+        $has_valid_license = false;
+        if ($this->licensing) {
+            $license_status = $this->licensing->getStatus();
+            $has_valid_license = isset($license_status['status']) && ($license_status['status'] === 'valid' || $license_status['status'] === 'active');
+        }
+        
         // Show notices.
         $this->render_notices();
         
         ?>
         <div class="wrap">
+            <?php if (!$has_valid_license): ?>
+                <div class="github-push-license-banner">
+                    <div class="github-push-banner-content">
+                        <div class="github-push-banner-icon">🚀</div>
+                        <div class="github-push-banner-text">
+                            <h3>Unlock Premium Features</h3>
+                            <p>Use your own <strong>private repositories</strong> and get <strong>email support</strong> with a GitHub Push subscription.</p>
+                            <ul class="github-push-banner-benefits">
+                                <li>✓ Use your own private GitHub repositories</li>
+                                <li>✓ Priority email support</li>
+                                <li>✓ Full plugin functionality</li>
+                            </ul>
+                        </div>
+                        <div class="github-push-banner-action">
+                            <a href="https://coderz.store" target="_blank" class="button button-primary button-large">Pricing</a>
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=github-push-license')); ?>" class="button button-secondary">Activate License</a>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+            
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             
             <?php if ($edit_repo): ?>
@@ -1033,42 +1141,89 @@ class Admin {
     }
     
     /**
-     * Add help tabs to admin pages.
+     * Render help page.
      */
-    public function add_help_tabs() {
-        $screen = get_current_screen();
+    public function render_help_page() {
+        ?>
+        <div class="wrap">
+            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            
+            <div class="github-push-help-tabs" style="margin-top: 20px;">
+                <nav class="nav-tab-wrapper">
+                    <a href="#overview" class="nav-tab nav-tab-active" data-tab="overview"><?php esc_html_e('Overview', GITHUB_PUSH_TEXT_DOMAIN); ?></a>
+                    <a href="#setup" class="nav-tab" data-tab="setup"><?php esc_html_e('Setup', GITHUB_PUSH_TEXT_DOMAIN); ?></a>
+                    <a href="#faq" class="nav-tab" data-tab="faq"><?php esc_html_e('FAQ', GITHUB_PUSH_TEXT_DOMAIN); ?></a>
+                </nav>
+                
+                <div id="help-tab-overview" class="help-tab-content active">
+                    <div class="help-content">
+                        <?php echo wp_kses_post($this->get_help_tab_content('overview')); ?>
+                    </div>
+                </div>
+                
+                <div id="help-tab-setup" class="help-tab-content" style="display: none;">
+                    <div class="help-content">
+                        <?php echo wp_kses_post($this->get_help_tab_content('setup')); ?>
+                    </div>
+                </div>
+                
+                <div id="help-tab-faq" class="help-tab-content" style="display: none;">
+                    <div class="help-content">
+                        <?php echo wp_kses_post($this->get_help_tab_content('faq')); ?>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f0f0f1; border-radius: 4px;">
+                <h3><?php esc_html_e('For more information:', GITHUB_PUSH_TEXT_DOMAIN); ?></h3>
+                <ul>
+                    <li><a href="https://github.com/settings/tokens" target="_blank"><?php esc_html_e('GitHub Token Settings', GITHUB_PUSH_TEXT_DOMAIN); ?></a></li>
+                    <li><a href="https://docs.github.com/en/rest" target="_blank"><?php esc_html_e('GitHub API Documentation', GITHUB_PUSH_TEXT_DOMAIN); ?></a></li>
+                </ul>
+            </div>
+        </div>
         
-        if (!$screen || strpos($screen->id, 'github-push') === false) {
-            return;
-        }
+        <style>
+            .github-push-help-tabs {
+                background: #fff;
+                border: 1px solid #ccd0d4;
+                box-shadow: 0 1px 1px rgba(0,0,0,.04);
+            }
+            .github-push-help-tabs .nav-tab-wrapper {
+                margin: 0;
+                border-bottom: 1px solid #ccd0d4;
+            }
+            .help-tab-content {
+                padding: 20px;
+            }
+            .help-content h3 {
+                margin-top: 0;
+            }
+            .help-content ul {
+                margin: 15px 0;
+            }
+            .help-content li {
+                margin: 8px 0;
+            }
+        </style>
         
-        // Overview tab
-        $screen->add_help_tab(array(
-            'id' => 'github-push-overview',
-            'title' => __('Overview', GITHUB_PUSH_TEXT_DOMAIN),
-            'content' => $this->get_help_tab_content('overview'),
-        ));
-        
-        // Setup tab
-        $screen->add_help_tab(array(
-            'id' => 'github-push-setup',
-            'title' => __('Setup', GITHUB_PUSH_TEXT_DOMAIN),
-            'content' => $this->get_help_tab_content('setup'),
-        ));
-        
-        // FAQ tab
-        $screen->add_help_tab(array(
-            'id' => 'github-push-faq',
-            'title' => __('FAQ', GITHUB_PUSH_TEXT_DOMAIN),
-            'content' => $this->get_help_tab_content('faq'),
-        ));
-        
-        // Help sidebar
-        $screen->set_help_sidebar(
-            '<p><strong>' . __('For more information:', GITHUB_PUSH_TEXT_DOMAIN) . '</strong></p>' .
-            '<p><a href="https://github.com/settings/tokens" target="_blank">' . __('GitHub Token Settings', GITHUB_PUSH_TEXT_DOMAIN) . '</a></p>' .
-            '<p><a href="https://docs.github.com/en/rest" target="_blank">' . __('GitHub API Documentation', GITHUB_PUSH_TEXT_DOMAIN) . '</a></p>'
-        );
+        <script>
+            jQuery(document).ready(function($) {
+                $('.github-push-help-tabs .nav-tab').on('click', function(e) {
+                    e.preventDefault();
+                    var tab = $(this).data('tab');
+                    
+                    // Update active tab
+                    $('.nav-tab').removeClass('nav-tab-active');
+                    $(this).addClass('nav-tab-active');
+                    
+                    // Show/hide content
+                    $('.help-tab-content').hide();
+                    $('#help-tab-' + tab).show();
+                });
+            });
+        </script>
+        <?php
     }
     
     /**
