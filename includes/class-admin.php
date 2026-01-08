@@ -231,6 +231,28 @@ class Admin {
     }
     
     /**
+     * Check if a valid license is active (with remote validation).
+     *
+     * @param bool $force_remote Whether to force remote validation.
+     * @return bool
+     */
+    private function has_valid_license($force_remote = true) {
+        if (!$this->licensing) {
+            return false;
+        }
+        
+        // Force remote validation to prevent bypassing with cached data.
+        $license_status = $this->licensing->getStatus($force_remote);
+        
+        if (!isset($license_status['status'])) {
+            return false;
+        }
+        
+        // Only accept 'valid' or 'active' status.
+        return in_array($license_status['status'], array('valid', 'active'), true);
+    }
+    
+    /**
      * Enqueue admin scripts and styles.
      *
      * @param string $hook Current admin page hook.
@@ -349,12 +371,8 @@ class Admin {
             true
         );
         
-        // Check license status for private repo restrictions.
-        $has_valid_license = false;
-        if ($this->licensing) {
-            $license_status = $this->licensing->getStatus();
-            $has_valid_license = isset($license_status['status']) && ($license_status['status'] === 'valid' || $license_status['status'] === 'active');
-        }
+        // Check license status for private repo restrictions (use cached for display).
+        $has_valid_license = $this->has_valid_license(false);
         
         wp_localize_script('github-push-admin', 'githubPush', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
@@ -397,14 +415,19 @@ class Admin {
         // Check if trying to add a private repository without valid license.
         if (!empty($repo_owner) && !empty($repo_name)) {
             $is_private = $this->github_api->is_repository_private($repo_owner, $repo_name);
+            if (is_wp_error($is_private)) {
+                // If we can't determine if private, log and continue (assume public to avoid blocking).
+                $this->logger->log('warning', 'Could not determine repository privacy status', array(
+                    'repo_owner' => $repo_owner,
+                    'repo_name' => $repo_name,
+                    'error' => $is_private->get_error_message(),
+                ));
+                $is_private = false;
+            }
+            
             if ($is_private) {
-                $has_valid_license = false;
-                if ($this->licensing) {
-                    $license_status = $this->licensing->getStatus();
-                    $has_valid_license = isset($license_status['status']) && ($license_status['status'] === 'valid' || $license_status['status'] === 'active');
-                }
-                
-                if (!$has_valid_license) {
+                // Force remote validation to prevent bypassing.
+                if (!$this->has_valid_license(true)) {
                     $this->logger->log('warning', 'Attempt to add private repository without valid license', array(
                         'repo_owner' => $repo_owner,
                         'repo_name' => $repo_name,
@@ -532,6 +555,36 @@ class Admin {
             exit;
         }
         
+        // Get existing repository to check if it's private.
+        $existing_repo = $this->repository_manager->get($repo_id);
+        if (!$existing_repo) {
+            wp_redirect(add_query_arg(array('page' => 'github-push', 'error' => 'invalid_id'), admin_url('admin.php')));
+            exit;
+        }
+        
+        // Check if repository is private and validate license (force remote check).
+        $is_private = $this->github_api->is_repository_private($existing_repo->repo_owner, $existing_repo->repo_name);
+        if (is_wp_error($is_private)) {
+            // If we can't determine if private, log and continue (assume public to avoid blocking).
+            $this->logger->log('warning', 'Could not determine repository privacy status', array(
+                'repo_id' => $repo_id,
+                'repo_owner' => $existing_repo->repo_owner,
+                'repo_name' => $existing_repo->repo_name,
+                'error' => $is_private->get_error_message(),
+            ));
+            $is_private = false;
+        }
+        
+        if ($is_private && !$this->has_valid_license(true)) {
+            $this->logger->log('warning', 'Attempt to edit private repository without valid license', array(
+                'repo_id' => $repo_id,
+                'repo_owner' => $existing_repo->repo_owner,
+                'repo_name' => $existing_repo->repo_name,
+            ));
+            wp_redirect(add_query_arg(array('page' => 'github-push', 'error' => 'private_repo_requires_license'), admin_url('admin.php')));
+            exit;
+        }
+        
         $branch = sanitize_text_field($_POST['branch'] ?? '');
         $plugin_slug = sanitize_text_field($_POST['plugin_slug'] ?? '');
         $install_path = sanitize_text_field($_POST['install_path'] ?? '');
@@ -609,12 +662,8 @@ class Admin {
         $edit_id = isset($_GET['edit']) ? absint($_GET['edit']) : 0;
         $edit_repo = $edit_id ? $this->repository_manager->get($edit_id) : null;
         
-        // Check if license is active
-        $has_valid_license = false;
-        if ($this->licensing) {
-            $license_status = $this->licensing->getStatus();
-            $has_valid_license = isset($license_status['status']) && ($license_status['status'] === 'valid' || $license_status['status'] === 'active');
-        }
+        // Check if license is active (use cached for display)
+        $has_valid_license = $this->has_valid_license(false);
         
         // Show notices.
         $this->render_notices();
@@ -635,7 +684,7 @@ class Admin {
                             </ul>
                         </div>
                         <div class="github-push-banner-action">
-                            <a href="https://coderz.store" target="_blank" class="button button-primary button-large">Pricing</a>
+                            <a href="https://coderz.store" target="_blank" class="button button-primary button-large">Upgrade now</a>
                             <a href="<?php echo esc_url(admin_url('admin.php?page=github-push-license')); ?>" class="button button-secondary">Activate License</a>
                         </div>
                     </div>

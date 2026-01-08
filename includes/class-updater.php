@@ -39,16 +39,25 @@ class Updater {
     private $logger;
     
     /**
+     * FluentLicensing instance.
+     *
+     * @var FluentLicensing|null
+     */
+    private $licensing;
+    
+    /**
      * Constructor.
      *
      * @param Github_API         $github_api         GitHub API instance.
      * @param Repository_Manager $repository_manager Repository Manager instance.
      * @param Logger             $logger             Logger instance.
+     * @param FluentLicensing    $licensing          FluentLicensing instance.
      */
-    public function __construct($github_api, $repository_manager, $logger) {
+    public function __construct($github_api, $repository_manager, $logger, $licensing = null) {
         $this->github_api = $github_api;
         $this->repository_manager = $repository_manager;
         $this->logger = $logger;
+        $this->licensing = $licensing;
     }
     
     /**
@@ -64,6 +73,26 @@ class Updater {
             'repo' => $repo->repo_owner . '/' . $repo->repo_name,
             'version' => $version,
         ));
+        
+        // Check if repository is private and validate license (force remote check).
+        $is_private = $this->github_api->is_repository_private($repo->repo_owner, $repo->repo_name);
+        if (is_wp_error($is_private)) {
+            // If we can't determine if private, log and continue (assume public to avoid blocking).
+            $this->logger->log('warning', 'Could not determine repository privacy status', array(
+                'repo_owner' => $repo->repo_owner,
+                'repo_name' => $repo->repo_name,
+                'error' => $is_private->get_error_message(),
+            ));
+            $is_private = false;
+        }
+        
+        if ($is_private && !$this->has_valid_license(true)) {
+            $this->logger->log('warning', 'Attempt to install private repository without valid license', array(
+                'repo_owner' => $repo->repo_owner,
+                'repo_name' => $repo->repo_name,
+            ));
+            return new \WP_Error('license_required', __('A valid license is required to install private repositories.', GITHUB_PUSH_TEXT_DOMAIN));
+        }
         
         // Create backup if updating existing installation.
         $backup_path = null;
@@ -159,6 +188,28 @@ class Updater {
     }
     
     /**
+     * Check if a valid license is active (with remote validation).
+     *
+     * @param bool $force_remote Whether to force remote validation.
+     * @return bool
+     */
+    private function has_valid_license($force_remote = true) {
+        if (!$this->licensing) {
+            return false;
+        }
+        
+        // Force remote validation to prevent bypassing with cached data.
+        $license_status = $this->licensing->getStatus($force_remote);
+        
+        if (!isset($license_status['status'])) {
+            return false;
+        }
+        
+        // Only accept 'valid' or 'active' status.
+        return in_array($license_status['status'], array('valid', 'active'), true);
+    }
+    
+    /**
      * Update plugin from repository.
      *
      * @param object $repo Repository object.
@@ -166,6 +217,26 @@ class Updater {
      */
     public function update($repo) {
         $this->logger->log('info', 'Starting plugin update', array('repo' => $repo->repo_owner . '/' . $repo->repo_name));
+        
+        // Check if repository is private and validate license (force remote check).
+        $is_private = $this->github_api->is_repository_private($repo->repo_owner, $repo->repo_name);
+        if (is_wp_error($is_private)) {
+            // If we can't determine if private, log and continue (assume public to avoid blocking).
+            $this->logger->log('warning', 'Could not determine repository privacy status', array(
+                'repo_owner' => $repo->repo_owner,
+                'repo_name' => $repo->repo_name,
+                'error' => $is_private->get_error_message(),
+            ));
+            $is_private = false;
+        }
+        
+        if ($is_private && !$this->has_valid_license(true)) {
+            $this->logger->log('warning', 'Attempt to update private repository without valid license', array(
+                'repo_owner' => $repo->repo_owner,
+                'repo_name' => $repo->repo_name,
+            ));
+            return new \WP_Error('license_required', __('A valid license is required to update private repositories.', GITHUB_PUSH_TEXT_DOMAIN));
+        }
         
         // Check if item is installed.
         if (!$this->is_installed($repo)) {

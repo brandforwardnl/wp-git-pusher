@@ -39,16 +39,56 @@ class Webhook_Handler {
     private $logger;
     
     /**
+     * FluentLicensing instance.
+     *
+     * @var FluentLicensing|null
+     */
+    private $licensing;
+    
+    /**
+     * GitHub API instance.
+     *
+     * @var Github_API
+     */
+    private $github_api;
+    
+    /**
      * Constructor.
      *
      * @param Updater           $updater            Updater instance.
      * @param Repository_Manager $repository_manager Repository Manager instance.
      * @param Logger            $logger             Logger instance.
+     * @param FluentLicensing   $licensing          FluentLicensing instance.
+     * @param Github_API        $github_api         GitHub API instance.
      */
-    public function __construct($updater, $repository_manager, $logger) {
+    public function __construct($updater, $repository_manager, $logger, $licensing = null, $github_api = null) {
         $this->updater = $updater;
         $this->repository_manager = $repository_manager;
         $this->logger = $logger;
+        $this->licensing = $licensing;
+        $this->github_api = $github_api;
+    }
+    
+    /**
+     * Check if a valid license is active (with remote validation).
+     *
+     * @param bool $force_remote Whether to force remote validation.
+     * @return bool
+     */
+    private function has_valid_license($force_remote = true) {
+        if (!$this->licensing) {
+            return false;
+        }
+        
+        // Force remote validation to prevent bypassing with cached data.
+        $license_status = $this->licensing->getStatus($force_remote);
+        
+        if (!isset($license_status['status'])) {
+            return false;
+        }
+        
+        // Only accept 'valid' or 'active' status.
+        return in_array($license_status['status'], array('valid', 'active'), true);
     }
     
     /**
@@ -187,6 +227,31 @@ class Webhook_Handler {
             if ($repo->repo_owner === $repo_owner && $repo->repo_name === $repo_name) {
                 // Check if this is the configured branch and auto-update is enabled.
                 if ($repo->branch === $branch && !$repo->use_releases) {
+                    // Check if repository is private and validate license (force remote check).
+                    $is_private = false;
+                    if ($this->github_api) {
+                        $private_check = $this->github_api->is_repository_private($repo->repo_owner, $repo->repo_name);
+                        if (is_wp_error($private_check)) {
+                            // If we can't determine if private, log and continue (assume public to avoid blocking).
+                            $this->logger->log('warning', 'Could not determine repository privacy status', array(
+                                'repo_owner' => $repo->repo_owner,
+                                'repo_name' => $repo->repo_name,
+                                'error' => $private_check->get_error_message(),
+                            ));
+                            $is_private = false;
+                        } else {
+                            $is_private = $private_check;
+                        }
+                    }
+                    
+                    if ($is_private && !$this->has_valid_license(true)) {
+                        $this->logger->log('warning', 'Webhook received for private repository without valid license', array(
+                            'repo' => $repo_owner . '/' . $repo_name,
+                            'branch' => $branch,
+                        ));
+                        continue;
+                    }
+                    
                     // Check if auto-update is enabled for this repository.
                     $auto_update = isset($repo->auto_update) ? (bool) $repo->auto_update : false;
                     
@@ -227,6 +292,30 @@ class Webhook_Handler {
         
         foreach ($repos as $repo) {
             if ($repo->repo_owner === $repo_owner && $repo->repo_name === $repo_name && $repo->use_releases) {
+                // Check if repository is private and validate license (force remote check).
+                $is_private = false;
+                if ($this->github_api) {
+                    $private_check = $this->github_api->is_repository_private($repo->repo_owner, $repo->repo_name);
+                    if (is_wp_error($private_check)) {
+                        // If we can't determine if private, log and continue (assume public to avoid blocking).
+                        $this->logger->log('warning', 'Could not determine repository privacy status', array(
+                            'repo_owner' => $repo->repo_owner,
+                            'repo_name' => $repo->repo_name,
+                            'error' => $private_check->get_error_message(),
+                        ));
+                        $is_private = false;
+                    } else {
+                        $is_private = $private_check;
+                    }
+                }
+                
+                if ($is_private && !$this->has_valid_license(true)) {
+                    $this->logger->log('warning', 'Webhook received for private repository without valid license', array(
+                        'repo' => $repo_owner . '/' . $repo_name,
+                    ));
+                    continue;
+                }
+                
                 // Check if auto-update is enabled for this repository.
                 $auto_update = isset($repo->auto_update) ? (bool) $repo->auto_update : false;
                 

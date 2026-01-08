@@ -118,11 +118,12 @@ class Plugin {
         Repository_Manager::migrate_table();
         
         $this->github_api = new Github_API($this->logger);
-        $this->updater = new Updater($this->github_api, $this->repository_manager, $this->logger);
-        $this->webhook_handler = new Webhook_Handler($this->updater, $this->repository_manager, $this->logger);
         
-        // Initialize licensing.
+        // Initialize licensing before creating updater and webhook handler.
         $this->init_licensing();
+        
+        $this->updater = new Updater($this->github_api, $this->repository_manager, $this->logger, $this->licensing ?? null);
+        $this->webhook_handler = new Webhook_Handler($this->updater, $this->repository_manager, $this->logger, $this->licensing ?? null, $this->github_api);
         
         // Initialize admin if in admin area.
         if (is_admin()) {
